@@ -9,6 +9,7 @@ namespace Ratchet.Audio
     public abstract class PlaybackDevice
     {
         public abstract bool Enabled { get; }
+        public abstract bool Default { get; }
         public abstract string Name { get; }
         public static List<PlaybackDevice> GetDevices() { return Factory.One.GetPlaybackDevices(); }
 

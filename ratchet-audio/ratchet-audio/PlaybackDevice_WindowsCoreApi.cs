@@ -12,6 +12,10 @@ namespace Ratchet.Audio
 
         const ushort WAVE_FORMAT_PCM = 1;
 
+        internal bool _Default = false;
+        public override bool Default { get { return _Default; } }
+
+
         static Guid IID_IAudioClient = new Guid("1CB9AD4C-DBFA-4c32-B178-C2F568A703B2");
 
         [StructLayout(LayoutKind.Sequential, Pack =1)]

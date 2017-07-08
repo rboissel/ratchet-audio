@@ -35,7 +35,6 @@ namespace Ratchet.Audio
             {
                 lock (_Parent)
                 {
-
                 }
             }
 
@@ -66,7 +65,6 @@ namespace Ratchet.Audio
             {
                 lock (_Parent)
                 {
-
                 }
             }
         }
@@ -200,6 +198,18 @@ namespace Ratchet.Audio
                     {
                         _PlaybackDevices.Add(uid, new PlaybackDevice_WindowsCoreApi(IMMDevice));
                     }
+                }
+
+                {
+                    IMMDevice Default;
+                    _IMMDeviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, 0x0, out Default);
+                    string uid = "";
+                    Default.GetId(out uid);
+                    if (!_PlaybackDevices.ContainsKey(uid))
+                    {
+                        _PlaybackDevices.Add(uid, new PlaybackDevice_WindowsCoreApi(Default));
+                    }
+                    _PlaybackDevices[uid]._Default = true;
                 }
 
                 _IMMDeviceEnumerator.EnumAudioEndpoints(EDataFlow.eCapture, 0xF, out IMMDeviceCollection);
