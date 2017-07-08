@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EE1D5778-B957-40FA-9114-F2A951F7064D}</ProjectGuid>
+    <ProjectGuid>{10D17654-E389-4EB4-B089-E13A6DEBF826}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ratchet_audio</RootNamespace>
     <AssemblyName>ratchet-audio</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -17,19 +17,22 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\Debug\lib\</OutputPath>
+    <OutputPath>..\..\bin\Debug\ratchet-audio\lib\net40\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\bin\Debug\ratchet-audio\lib\net40\ratchet-audio.xml</DocumentationFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\Release\lib\</OutputPath>
+    <OutputPath>..\..\bin\Release\ratchet-audio\lib\net40\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\bin\Release\ratchet-audio\lib\net40\ratchet-audio.xml</DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -42,16 +45,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PlaybackClient.cs" />
-    <Compile Include="PlaybackClient_WindowsCoreApi.cs" />
-    <Compile Include="PlaybackDevice.cs" />
-    <Compile Include="Factory.cs" />
-    <Compile Include="Factory_WindowsCoreApi.cs" />
-    <Compile Include="PlaybackDevice_WindowsCoreApi.cs" />
+    <Compile Include="..\..\ratchet-audio\Factory.cs">
+      <Link>Factory.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ratchet-audio\Factory_WindowsCoreApi.cs">
+      <Link>Factory_WindowsCoreApi.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ratchet-audio\PlaybackClient.cs">
+      <Link>PlaybackClient.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ratchet-audio\PlaybackClient_WindowsCoreApi.cs">
+      <Link>PlaybackClient_WindowsCoreApi.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ratchet-audio\PlaybackDevice.cs">
+      <Link>PlaybackDevice.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ratchet-audio\PlaybackDevice_WindowsCoreApi.cs">
+      <Link>PlaybackDevice_WindowsCoreApi.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ratchet-audio\PropertyStore_WindowsCoreApi.cs">
+      <Link>PropertyStore_WindowsCoreApi.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ratchet-audio\RecordingDevice.cs">
+      <Link>RecordingDevice.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ratchet-audio\RecordingDevice_WindowsCoreApi.cs">
+      <Link>RecordingDevice_WindowsCoreApi.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyStore_WindowsCoreApi.cs" />
-    <Compile Include="RecordingDevice.cs" />
-    <Compile Include="RecordingDevice_WindowsCoreApi.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

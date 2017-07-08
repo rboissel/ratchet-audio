@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2016/06/nuspec.xsd">
+  <metadata>
+    <id>Ratchet.Audio.Core</id>
+    <version>1.0.0.0</version>
+    <authors>rboissel</authors>
+    <owners>rboissel</owners>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/rboissel/ratchet-audio</projectUrl>
+    <iconUrl>https://github.com/rboissel/ratchet-audio/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <description>Ratchet Audio Core is a library part of the ratchet project that can be used to play and record sound.</description>
+    <copyright>Copyright ©2017 Raphael Boissel</copyright>
+    <language>en-US</language>
+    <tags>ratchet audio sound music player play recorder record</tags>
+  </metadata>
+</package>
