@@ -7,7 +7,7 @@
     <owners>rboissel</owners>
     <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
     <projectUrl>https://github.com/rboissel/ratchet-audio</projectUrl>
-    <iconUrl>https://github.com/rboissel/ratchet-audio/icon.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/rboissel/ratchet/master/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
     <description>Ratchet Audio Core is a library part of the ratchet project that can be used to play and record sound.</description>
