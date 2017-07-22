@@ -94,21 +94,27 @@ namespace Ratchet.Audio
 
         void Loop()
         {
+            int padding = 0;
+            _IAudioClient.GetCurrentPadding(out padding);
+
+            int waitTime = (int)((ulong)padding / (_SampleRate / 1000) / 2);
             while (true)
             {
                 IntPtr pBuffer;
-                int padding = 0;
-                System.Threading.Thread.Sleep((int)(_BufferDuration / 2));
+                System.Threading.Thread.Sleep((int)(waitTime));
                 lock (this)
                 {
                     _IAudioClient.GetCurrentPadding(out padding);
-                    int count = _Stream.Read(_FullBuffer, 0, ((int)_BufferFrameCount - padding) * _FrameSize);
+                    int count = _Stream.Read(_FullBuffer, 0, (((int)_BufferFrameCount - padding) * _FrameSize));
+                    if (count > ((int)_BufferFrameCount - padding) * _FrameSize) { throw new Exception("More data provided by than asked for"); }
                     if (count > 0)
                     {
                         _IAudioRenderClient.GetBuffer(count / _FrameSize, out pBuffer);
                         System.Runtime.InteropServices.Marshal.Copy(_FullBuffer, 0, pBuffer, count);
                         _IAudioRenderClient.ReleaseBuffer(count / _FrameSize, 0);
+                        waitTime = (int)((ulong)(padding + count / _FrameSize) / (_SampleRate / 1000)) / 2;
                     }
+                    if (waitTime == 0 && count == 0) { waitTime = 20; }
                 }
             }
         }
