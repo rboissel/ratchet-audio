@@ -66,11 +66,20 @@
     <Compile Include="..\..\ratchet-audio\PropertyStore_WindowsCoreApi.cs">
       <Link>PropertyStore_WindowsCoreApi.cs</Link>
     </Compile>
+    <Compile Include="..\..\ratchet-audio\RecordingClient.cs">
+      <Link>RecordingClient.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ratchet-audio\RecordingClient_WindowsCoreApi.cs">
+      <Link>RecordingClient_WindowsCoreApi.cs</Link>
+    </Compile>
     <Compile Include="..\..\ratchet-audio\RecordingDevice.cs">
       <Link>RecordingDevice.cs</Link>
     </Compile>
     <Compile Include="..\..\ratchet-audio\RecordingDevice_WindowsCoreApi.cs">
       <Link>RecordingDevice_WindowsCoreApi.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ratchet-audio\WindowsCoreApiTools.cs">
+      <Link>WindowsCoreApiTools.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

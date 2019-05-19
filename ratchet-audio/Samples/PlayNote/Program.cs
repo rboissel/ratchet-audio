@@ -80,6 +80,8 @@ namespace PlayNote
                 // Play a A 440 on each enabled device
                 if (playbackDevice[n].Enabled)
                 {
+                    Console.WriteLine(playbackDevice[n].Name);
+
                     NoteStream stream = new NoteStream();
                     Ratchet.Audio.PlaybackClient Client = playbackDevice[n].CreateClient(stream);
                     stream.Configure(Client.Format, Client.SampleRate, Client.ChannelCount, 440);

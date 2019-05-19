@@ -10,12 +10,6 @@ namespace Ratchet.Audio
 {
     class PlaybackClient_WindowsCoreApi : PlaybackClient
     {
-        internal enum AUDCLNT_SHAREMODE : int
-        {
-            AUDCLNT_SHAREMODE_SHARED = 0,
-            AUDCLNT_SHAREMODE_EXCLUSIVE
-        }
-
         internal enum CLSCTX : int
         {
             CLSCTX_INPROC_SERVER = 0x1,
@@ -24,25 +18,6 @@ namespace Ratchet.Audio
             CLSCTX_REMOTE_SERVER = 0x10,
             CLSCTX_SERVER = (CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER | CLSCTX_REMOTE_SERVER),
             CLSCTX_ALL = (CLSCTX_INPROC_HANDLER | CLSCTX_SERVER)
-        }
-
-        [System.Runtime.InteropServices.ComImport]
-        [Guid("1CB9AD4C-DBFA-4c32-B178-C2F568A703B2")]
-        [System.Runtime.InteropServices.InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        internal interface IAudioClient
-        {
-            void Initialize(AUDCLNT_SHAREMODE ShareMode, int StreamFlags, long hnsBufferDuration, long hnsPeriodicity, [In] IntPtr Format, Guid AudioSessionGuid);
-            void GetBufferSize([Out] out uint numBufferFrames);
-            void GetStreamLatency();
-            int GetCurrentPadding([Out] out int currentPadding);
-            void IsFormatSupported();
-            void GetMixFormat([Out] out IntPtr pDeviceFormat);
-            void GetDevicePeriod();
-            void Start();
-            void Stop();
-            void Reset();
-            int SetEventHandle(IntPtr eventHandle);
-            int GetService(ref Guid interfaceId, [Out] out IAudioRenderClient renderClient);
         }
 
         static Guid IID_IAudioRenderClient = new Guid("F294ACFC-3146-4483-A7BF-ADDCA7C260E2");
@@ -67,7 +42,7 @@ namespace Ratchet.Audio
 
         System.Threading.Thread _Thread;
 
-        IAudioClient _IAudioClient;
+        Factory_WindowsCoreApi.IAudioClient _IAudioClient;
         IAudioRenderClient _IAudioRenderClient;
         System.IO.Stream _Stream;
         uint _BufferFrameCount = 0;
@@ -75,10 +50,12 @@ namespace Ratchet.Audio
         uint _BufferDuration = 0;
         byte[] _FullBuffer = null;
 
-        internal PlaybackClient_WindowsCoreApi(IAudioClient IAudioClient, System.IO.Stream Stream, int NumChannel, int FrameSize, uint SamplesRate, Type DataFormat)
+        internal PlaybackClient_WindowsCoreApi(Factory_WindowsCoreApi.IAudioClient IAudioClient, System.IO.Stream Stream, int NumChannel, int FrameSize, uint SamplesRate, Type DataFormat)
         {
+            object opaqueService;
             _IAudioClient = IAudioClient;
-            _IAudioClient.GetService(ref IID_IAudioRenderClient, out _IAudioRenderClient);
+            _IAudioClient.GetService(ref IID_IAudioRenderClient, out opaqueService);
+            _IAudioRenderClient = (IAudioRenderClient)opaqueService;
             _IAudioClient.GetBufferSize(out _BufferFrameCount);
             _Stream = Stream;
             _FrameSize = FrameSize;
@@ -125,7 +102,6 @@ namespace Ratchet.Audio
             {
                 IntPtr pBuffer;
                 int count = _Stream.Read(_FullBuffer, 0, (int)_BufferFrameCount * _FrameSize);
-                Console.WriteLine(count / _FrameSize);
 
                 if (count > 0)
                 {

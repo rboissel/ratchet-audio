@@ -10,6 +10,144 @@ namespace Ratchet.Audio
 {
     class Factory_WindowsCoreApi : Factory
     {
+        const ushort WAVE_FORMAT_PCM = 1;
+
+        internal enum AUDCLNT_SHAREMODE : int
+        {
+            AUDCLNT_SHAREMODE_SHARED = 0,
+            AUDCLNT_SHAREMODE_EXCLUSIVE
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        internal struct WAVEFORMATEX
+        {
+
+            public ushort wFormatTag;
+            public ushort nChannels;
+            public uint nSamplesPerSec;
+            public uint nAvgBytesPerSec;
+            public ushort nBlockAlign;
+            public ushort wBitsPerSample;
+            public ushort cbSize;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        internal struct WAVEFORMATEXTENSIBLE
+        {
+            WAVEFORMATEX Format;
+            public ushort wReserved;
+            public uint dwChannelMask;
+            public Guid SubFormat;
+        }
+
+        enum WAVE_FORMAT
+        {
+            PCM = 1,
+            IEEE = 6
+        }
+
+        internal static Guid IID_IAudioClient = new Guid("1CB9AD4C-DBFA-4c32-B178-C2F568A703B2");
+        [System.Runtime.InteropServices.ComImport]
+        [Guid("1CB9AD4C-DBFA-4c32-B178-C2F568A703B2")]
+        [System.Runtime.InteropServices.InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        internal interface IAudioClient
+        {
+            void Initialize(AUDCLNT_SHAREMODE ShareMode, int StreamFlags, long hnsBufferDuration, long hnsPeriodicity, [In] IntPtr Format, Guid AudioSessionGuid);
+            void GetBufferSize([Out] out uint numBufferFrames);
+            void GetStreamLatency();
+            int GetCurrentPadding([Out] out int currentPadding);
+            void IsFormatSupported();
+            void GetMixFormat([Out] out IntPtr pDeviceFormat);
+            void GetDevicePeriod();
+            void Start();
+            void Stop();
+            void Reset();
+            int SetEventHandle(IntPtr eventHandle);
+            int GetService(ref Guid interfaceId, [Out, MarshalAs(UnmanagedType.IUnknown)] out object renderClient);
+        }
+
+        WAVEFORMATEX createWaveFormat(int BitPerSample, int SamplePerSecond, int ChannelCount)
+        {
+            WAVEFORMATEX waveformat = new WAVEFORMATEX();
+            waveformat.wFormatTag = WAVE_FORMAT_PCM;
+            waveformat.wBitsPerSample = (ushort)BitPerSample;
+            waveformat.nBlockAlign = (ushort)((ChannelCount * BitPerSample) / 8);
+            waveformat.nAvgBytesPerSec = (uint)(SamplePerSecond * (uint)waveformat.nBlockAlign);
+            waveformat.nChannels = (ushort)ChannelCount;
+            waveformat.nSamplesPerSec = (uint)SamplePerSecond;
+            return waveformat;
+        }
+
+        static Guid FormatEx_IEEE = new Guid("00000003-0000-0010-8000-00AA00389B71");
+        static Guid FormatEx_PCM = new Guid("00000001-0000-0010-8000-00AA00389B71");
+        internal static unsafe Factory_WindowsCoreApi.IAudioClient CreateClient(IMMDevice IDevice, out WAVEFORMATEX format, out Type dataFormat)
+        {
+            Factory_WindowsCoreApi.IAudioClient IAudioClient;
+            IDevice.Activate(Factory_WindowsCoreApi.IID_IAudioClient, (uint)PlaybackClient_WindowsCoreApi.CLSCTX.CLSCTX_ALL, new IntPtr(0), out IAudioClient);
+
+            IntPtr rawFormatPtr = new IntPtr();
+            IAudioClient.GetMixFormat(out rawFormatPtr);
+            WAVEFORMATEX* pFormat = (WAVEFORMATEX*)rawFormatPtr.ToPointer();
+            if (pFormat->wBitsPerSample % 8 != 0) { throw new Exception("Unsupported bits per sample value"); }
+            dataFormat = typeof(byte);
+            if (pFormat->wFormatTag == 0xFFFE)
+            {
+                WAVEFORMATEXTENSIBLE* pFormatEx = (WAVEFORMATEXTENSIBLE*)pFormat;
+                if (pFormatEx->SubFormat == FormatEx_IEEE)
+                {
+                    switch (pFormat->wBitsPerSample)
+                    {
+                        case 0: case 32: dataFormat = typeof(float); break;
+                        case 64: dataFormat = typeof(double); break;
+                        default: throw new Exception("Unsupported underlying data format");
+                    }
+                }
+                else if (pFormatEx->SubFormat == FormatEx_PCM)
+                {
+                    switch (pFormat->wBitsPerSample)
+                    {
+                        case 8: dataFormat = typeof(byte); break;
+                        case 16: dataFormat = typeof(Int16); break;
+                        case 32: dataFormat = typeof(Int32); break;
+                        case 64: dataFormat = typeof(Int64); break;
+                        default: throw new Exception("Unsupported underlying data format");
+                    }
+                }
+            }
+            else
+            {
+                switch ((WAVE_FORMAT)pFormat->wFormatTag)
+                {
+                    case WAVE_FORMAT.PCM:
+                        switch (pFormat->wBitsPerSample)
+                        {
+                            case 8: dataFormat = typeof(byte); break;
+                            case 16: dataFormat = typeof(Int16); break;
+                            case 32: dataFormat = typeof(Int32); break;
+                            case 64: dataFormat = typeof(Int64); break;
+                            default: throw new Exception("Unsupported underlying data format");
+                        }
+                        break;
+                    case WAVE_FORMAT.IEEE:
+                        switch (pFormat->wBitsPerSample)
+                        {
+                            case 0: case 32: dataFormat = typeof(float); break;
+                            case 64: dataFormat = typeof(double); break;
+                            default: throw new Exception("Unsupported underlying data format");
+                        }
+                        break;
+                }
+            }
+            try
+            {
+                IAudioClient.Initialize(Factory_WindowsCoreApi.AUDCLNT_SHAREMODE.AUDCLNT_SHAREMODE_SHARED, 0, 10000000, 0, new IntPtr(pFormat), Guid.Empty);
+            }
+            catch { throw new Exception("Unexpected error when creating the client"); }
+
+            format = *pFormat;
+            return IAudioClient;
+        }
+
         [System.Runtime.InteropServices.ComImport]
         [Guid("7991EEC9-7E89-4D85-8390-6C703CEC60C0")]
         [System.Runtime.InteropServices.InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -95,7 +233,7 @@ namespace Ratchet.Audio
         [System.Runtime.InteropServices.InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         internal interface IMMDevice
         {
-            void Activate(ref Guid iid, uint dwClsCtx, IntPtr pActivationParams, [Out] out PlaybackClient_WindowsCoreApi.IAudioClient ppInterface);
+            void Activate(ref Guid iid, uint dwClsCtx, IntPtr pActivationParams, [Out] out IAudioClient ppInterface);
             void OpenPropertyStore(uint stgmAccess, [Out] out IPropertyStore propertyStore);
             void GetId([Out, MarshalAs(UnmanagedType.LPWStr)] out string ppstrId);
             void GetState([Out] out uint pdwState);
